@@ -1,11 +1,10 @@
-from core.ingredient import Ingredient 
+from core.ingredient import Ingridient 
 from core.mixed import Mixed 
 
 TEST_INPUT = [
-        Ingredient(name = "Черная роза", omnisention = 60, properties = ["А", "А", "В"])
-        Ingredient(name = "leg", omnisention = 500, properties = ["Б", "В", "Плюс хит"])
-        ]
-
+    Ingridient(name = "Черная роза", omnisention = 60, properties = ["А", "А", "В"]),
+    Ingridient(name = "leg", omnisention = 500, properties = ["Б", "В", "Плюс хит"])
+]
 
 
 def main():
@@ -42,7 +41,8 @@ def main():
             
             print("\n=== Начинается процесс варки... ===")
 
-            poison = Mixed(cauldron)
+            # Переименовали в potion, чтобы совпадало с нижними строками
+            potion = Mixed(cauldron)
 
             print("\nФинальный состав зелья (Рецепт):")
             for item in potion.recept:
@@ -51,16 +51,14 @@ def main():
             print(f"\nИтоговая омнисенция получившегося зелья: {potion.omnisention}")
             print(f"Итоговые эффекты: {potion.properties}")
             
-            # Очищаем котел для следующей варки
             cauldron.clear()
             input("\nНажмите Enter, чтобы продолжить...")
 
         else:
-            # Если ввели число — пытаемся добавить ингредиент по индексу
             try:
                 idx = int(choice)
-                if 0 <= idx < len(AVAILABLE_INGREDIENTS):
-                    selected_ing = AVAILABLE_INGREDIENTS[idx]
+                if 0 <= idx < len(TEST_INPUT):
+                    selected_ing = TEST_INPUT[idx]
                     cauldron.append(selected_ing)
                     print(f"Добавлено: {selected_ing.name}")
                 else:
@@ -69,4 +67,4 @@ def main():
                 print("Неизвестная команда!")
 
 if __name__ == "__main__":
-    main()
+    main()   

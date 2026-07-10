@@ -1,5 +1,5 @@
 class Ingridient:
-    def __init__ (self, name: str, image: str = "no img": str, omnisention: int, properties: list, rareness: str = "A"):
+    def __init__ (self, name: str, image: str = "no img", omnisention: int = 0, properties: list = [], rareness: str = "A"):
         self.__name = name
         self.__image = image
         self.__omnisention = omnisention
@@ -12,9 +12,9 @@ class Ingridient:
 
     @property
     def omnisention(self):
-        return int(self._omnisention)
+        return int(self.__omnisention)
 
     @property
     def name(self):
-        return self._name
+        return self.__name
 

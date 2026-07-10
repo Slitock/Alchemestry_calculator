@@ -1,4 +1,4 @@
-from ingredients import Ingridient
+from core.ingredient import Ingridient
 from database.test_bd import PROPERTIES
 from database.omnisention_info import OMNISENTION_GRADUET
 from math import ceil
@@ -21,12 +21,14 @@ class Mixed:
 
          
     def _resoulve_conflict(self, raw_properties): #обработка эффектов в соответсвии с таблицей.
-       for effect, antieffect in PROPERTIES.items():
+        for effect, antieffect in PROPERTIES.items():
            while (effect in raw_properties) and (antieffect in raw_properties):
                 raw_properties.remove(effect)
                 raw_properties.remove(antieffect)
-        return raw_properties 
+
+        return raw_properties
     
+
     def _omnisention_counter(self, raw_omnisention, properties): #подсчет омнисенции
         count_of_properties = len(properties)
         range_list = OMNISENTION_GRADUET.get(count_of_properties)
@@ -46,14 +48,21 @@ class Mixed:
 
         if added_ihor_cristal > 0:
             self.__recept.append(f"кристал ихора ({added_ihor_cristal} шт.)")
-            return raw_omnisention
 
         elif added_cenom_cristal > 0:
             self.__recept.append(f" кристал кенома ({added_cenom_cristal} шт.)")
-            return raw_omnisention
+        return raw_omnisention
 
 
-        @property
-        def __recept(self):
-            return self.__recept
+    @property
+    def recept(self):
+        return self.__recept
+
+    @property
+    def properties(self):
+        return self.__properties
+
+    @property
+    def omnisention(self):
+        return self.__omnisention
 
