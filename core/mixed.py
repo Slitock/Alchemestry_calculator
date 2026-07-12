@@ -52,7 +52,7 @@ class Mixed:
             self.__recept.append(f"кристал ихора ({added_ihor_cristal} шт.)")
 
         elif added_cenom_cristal > 0:
-            self.__recept.append(f" кристал кенома ({added_cenom_cristal} шт.)")
+            self.__recept.append(f"кристал кенома ({added_cenom_cristal} шт.)")
         return raw_omnisention
 
     @property
