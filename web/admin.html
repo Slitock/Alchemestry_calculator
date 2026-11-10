@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Админка · Алхимический котёл</title>
+    <link rel="stylesheet" href="/static/style.css" />
+    <link rel="stylesheet" href="/static/admin.css" />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚗️</text></svg>" />
+  </head>
+  <body class="admin-body">
+    <div class="backdrop" aria-hidden="true"></div>
+
+    <header class="admin-topbar">
+      <div>
+        <h1>Админка</h1>
+        <p class="subtitle">
+          Ингредиенты, эффекты и антагонисты
+          <span class="dot">·</span>
+          <span id="db-state" class="status">загрузка…</span>
+        </p>
+      </div>
+      <a class="btn btn--ghost admin-topbar__link" href="/">← К котлу</a>
+    </header>
+
+    <main class="admin-grid">
+      <!-- Список ингредиентов -->
+      <section class="panel admin-list" aria-labelledby="list-title">
+        <div class="panel__head">
+          <h2 id="list-title">Ингредиенты</h2>
+          <span class="hint" id="list-count"></span>
+        </div>
+
+        <div class="admin-list__tools">
+          <input
+            id="search"
+            class="search"
+            type="search"
+            placeholder="Поиск по названию"
+            autocomplete="off"
+          />
+          <button type="button" class="btn btn--ghost" id="new-button">Новый</button>
+        </div>
+
+        <ul class="admin-ingredients" id="ingredient-list"></ul>
+      </section>
+
+      <!-- Редактор -->
+      <section class="panel admin-editor" aria-labelledby="editor-title">
+        <div class="panel__head">
+          <h2 id="editor-title">Новый ингредиент</h2>
+          <span class="hint" id="editor-hint"></span>
+        </div>
+
+        <form class="admin-form" id="form" novalidate>
+          <label class="field">
+            <span class="field__label">Название</span>
+            <input
+              class="search"
+              id="field-name"
+              maxlength="80"
+              placeholder="Например, лунный шип"
+              autocomplete="off"
+            />
+          </label>
+
+          <div class="field-row">
+            <label class="field field--narrow">
+              <span class="field__label">Омнисенция</span>
+              <input
+                class="search"
+                id="field-omnisention"
+                type="number"
+                min="-999"
+                max="999"
+                step="1"
+                value="0"
+              />
+            </label>
+            <label class="field field--narrow">
+              <span class="field__label">Редкость</span>
+              <select class="search" id="field-rareness">
+                <option value="E">E</option>
+                <option value="D">D</option>
+                <option value="C">C</option>
+                <option value="B">B</option>
+                <option value="A">A</option>
+                <option value="S">S</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="field">
+            <span class="field__label">
+              Эффекты <span class="hint" id="effects-count"></span>
+            </span>
+            <div class="effect-chips" id="effect-chips"></div>
+            <div class="effect-add">
+              <select class="search" id="effect-select" aria-label="Эффект для добавления"></select>
+              <button type="button" class="btn btn--ghost" id="effect-add">Добавить</button>
+            </div>
+            <p class="admin-note">
+              Один и тот же эффект можно добавить дважды — для правил это два
+              разных эффекта.
+            </p>
+          </div>
+
+          <div class="admin-form__actions">
+            <button type="submit" class="btn btn--primary" id="save-button">Сохранить</button>
+            <button type="button" class="btn btn--ghost" id="reset-button">Сбросить</button>
+            <button type="button" class="btn btn--danger" id="delete-button" hidden>
+              Удалить
+            </button>
+          </div>
+
+          <ul class="admin-form__errors" id="form-errors" hidden></ul>
+        </form>
+      </section>
+
+      <!-- Справочник эффектов и антагонистов -->
+      <section class="panel admin-dictionary" aria-labelledby="dict-title">
+      <div class="panel__head">
+        <h2 id="dict-title">Эффекты и антагонисты</h2>
+        <span class="hint">встретившись в котле, пара взаимно гасится</span>
+      </div>
+
+      <div class="admin-dictionary__grid">
+        <div>
+          <p class="field__label">Пары</p>
+          <ul class="admin-pairs" id="pairs"></ul>
+        </div>
+
+        <div class="admin-dictionary__forms">
+          <div class="field-row field-row--pair">
+            <label class="field">
+              <span class="field__label">Эффект</span>
+              <select class="search" id="pair-a"></select>
+            </label>
+            <label class="field">
+              <span class="field__label">Антагонист</span>
+              <select class="search" id="pair-b"></select>
+            </label>
+            <button type="button" class="btn btn--ghost" id="pair-add">Добавить пару</button>
+          </div>
+
+          <div class="field-row field-row--pair">
+            <label class="field">
+              <span class="field__label">Новый эффект</span>
+              <input
+                class="search"
+                id="new-effect"
+                maxlength="60"
+                placeholder="Например, жажда"
+                autocomplete="off"
+              />
+            </label>
+            <button type="button" class="btn btn--ghost" id="new-effect-add">
+              Добавить в справочник
+            </button>
+          </div>
+        </div>
+      </div>
+      </section>
+    </main>
+
+    <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+    <script src="/static/admin.js" defer></script>
+  </body>
+</html>

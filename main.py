@@ -3,7 +3,7 @@ from core.mixed import Mixed
 
 from database.ingridients import INGREDIENTS
 
-AVAILABLE_INGREDIENTS = [
+AVAILABLE_INGREDIENTS = [  # Демо создание ингридиентов
     Ingridient(
         name=name,
         omnisention=info["omnisention"],
@@ -52,7 +52,6 @@ def main():
 
             print("\n=== Начинается процесс варки... ===")
 
-            # Переименовали в potion, чтобы совпадало с нижними строками
             potion = Mixed(cauldron)
 
             print("\nФинальный состав зелья (Рецепт):")

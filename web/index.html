@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Алхимический котёл</title>
+    <link rel="stylesheet" href="/static/style.css" />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚗️</text></svg>" />
+  </head>
+  <body>
+    <div class="backdrop" aria-hidden="true"></div>
+
+    <header class="topbar">
+      <div>
+        <h1>Алхимический котёл</h1>
+        <p class="subtitle">
+          Лаборатория в локальной сети
+          <span class="dot">·</span>
+          <span id="server-status" class="status">подключение…</span>
+        </p>
+      </div>
+      <div class="cauldron-stats" id="cauldron-stats">
+        <div class="stat">
+          <span class="stat__label">в котле</span>
+          <strong id="stat-count">0</strong>
+        </div>
+        <div class="stat">
+          <span class="stat__label">сырая омнисенция</span>
+          <strong id="stat-omnisention">0</strong>
+        </div>
+      </div>
+    </header>
+
+    <div class="mobile-tabs-wrap">
+      <nav class="mobile-tabs" aria-label="Разделы">
+        <button type="button" class="mobile-tab" data-tab="ingredients" aria-pressed="true">
+          Ингредиенты
+        </button>
+        <button type="button" class="mobile-tab" data-tab="cauldron" aria-pressed="false">
+          Котёл<span class="mobile-tab__badge" id="tab-badge" hidden>0</span>
+        </button>
+        <button type="button" class="mobile-tab" data-tab="help" aria-pressed="false">Помощь</button>
+      </nav>
+    </div>
+
+    <main class="layout">
+      <!-- ЛЕВАЯ КОЛОНКА: ингредиенты -->
+      <section class="panel panel--ingredients" data-panel="ingredients" data-mobile-active="true" aria-labelledby="ingredients-title">
+        <div class="panel__head">
+          <h2 id="ingredients-title">Ингредиенты</h2>
+          <span class="hint" id="ingredients-count"></span>
+        </div>
+
+        <div class="filters">
+          <input
+            id="search"
+            class="search"
+            type="search"
+            placeholder="Поиск по названию или эффекту"
+            autocomplete="off"
+            aria-label="Поиск ингредиента"
+          />
+          <div class="rarity-filter" id="rarity-filter" role="group" aria-label="Фильтр по редкости"></div>
+        </div>
+
+        <ul class="ingredients" id="ingredient-list"></ul>
+        <p class="empty" id="ingredients-empty" hidden>Ничего не нашлось.</p>
+      </section>
+
+      <!-- ЦЕНТР: котёл -->
+      <section class="panel panel--cauldron" data-panel="cauldron" data-mobile-active="false" aria-labelledby="cauldron-title">
+        <div class="panel__head">
+          <h2 id="cauldron-title">Котёл</h2>
+          <span class="hint">нажми на котёл, чтобы сварить</span>
+        </div>
+
+        <div class="cauldron-stage">
+          <button
+            type="button"
+            id="cauldron"
+            class="cauldron"
+            aria-label="Сварить зелье из добавленных ингредиентов"
+          >
+            <svg class="cauldron__svg" viewBox="0 0 320 260" role="img" aria-hidden="true">
+              <defs>
+                <linearGradient id="pot-body" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%" stop-color="#4b3f4e" />
+                  <stop offset="45%" stop-color="#2a2230" />
+                  <stop offset="100%" stop-color="#191320" />
+                </linearGradient>
+                <linearGradient id="pot-rim" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%" stop-color="#7d6634" />
+                  <stop offset="35%" stop-color="#d9b264" />
+                  <stop offset="65%" stop-color="#9c7f42" />
+                  <stop offset="100%" stop-color="#5d4a25" />
+                </linearGradient>
+                <radialGradient id="brew" cx="50%" cy="40%" r="70%">
+                  <stop offset="0%" stop-color="#7ff2c4" stop-opacity="0.95" />
+                  <stop offset="55%" stop-color="#2e9e86" stop-opacity="0.9" />
+                  <stop offset="100%" stop-color="#0f4a45" stop-opacity="1" />
+                </radialGradient>
+                <filter id="soft-glow" x="-50%" y="-50%" width="200%" height="200%">
+                  <feGaussianBlur stdDeviation="9" result="blur" />
+                  <feMerge>
+                    <feMergeNode in="blur" />
+                    <feMergeNode in="SourceGraphic" />
+                  </feMerge>
+                </filter>
+              </defs>
+
+              <!-- ручки -->
+              <path d="M52 104 C18 110 18 152 56 156" fill="none" stroke="#8a7040" stroke-width="9" stroke-linecap="round" opacity="0.85" />
+              <path d="M268 104 C302 110 302 152 264 156" fill="none" stroke="#8a7040" stroke-width="9" stroke-linecap="round" opacity="0.85" />
+
+              <!-- ножки -->
+              <path d="M96 222 L82 252 L108 252 L118 226 Z" fill="#221a28" stroke="#3b3040" />
+              <path d="M224 222 L238 252 L212 252 L202 226 Z" fill="#221a28" stroke="#3b3040" />
+
+              <!-- тело -->
+              <path
+                d="M44 90 C38 168 74 214 128 226 C150 231 170 231 192 226 C246 214 282 168 276 90 Z"
+                fill="url(#pot-body)"
+                stroke="#5c4a63"
+                stroke-width="2"
+              />
+              <path
+                d="M70 104 C66 162 92 200 132 212"
+                fill="none"
+                stroke="#6d5a76"
+                stroke-width="4"
+                stroke-linecap="round"
+                opacity="0.3"
+              />
+
+              <!-- обод и внутренняя поверхность -->
+              <ellipse cx="160" cy="90" rx="118" ry="26" fill="url(#pot-rim)" />
+              <ellipse cx="160" cy="90" rx="100" ry="19" fill="#0d0912" />
+
+              <!-- варево -->
+              <g class="cauldron__brew">
+                <ellipse cx="160" cy="91" rx="98" ry="17.5" fill="url(#brew)" />
+                <ellipse class="cauldron__glow" cx="160" cy="91" rx="86" ry="13" fill="#5ef2b8" opacity="0.35" filter="url(#soft-glow)" />
+                <ellipse cx="130" cy="86" rx="30" ry="6" fill="#d6fff0" opacity="0.18" />
+                <circle class="bubble" cx="140" cy="91" r="3" fill="#c9ffe9" opacity="0.5" />
+                <circle class="bubble bubble--2" cx="168" cy="95" r="2.2" fill="#c9ffe9" opacity="0.45" />
+                <circle class="bubble bubble--3" cx="188" cy="88" r="2.6" fill="#c9ffe9" opacity="0.4" />
+              </g>
+
+              <!-- блик на ободе -->
+              <ellipse cx="160" cy="90" rx="118" ry="26" fill="none" stroke="#e9c988" stroke-opacity="0.45" />
+              <ellipse cx="160" cy="90" rx="100" ry="19" fill="none" stroke="#e2c07a" stroke-opacity="0.25" />
+            </svg>
+
+            <span class="cauldron__badge" id="cauldron-badge" hidden>0</span>
+            <span class="cauldron__hint" id="cauldron-hint">Котёл пуст</span>
+          </button>
+
+          <div class="cauldron__contents" id="cauldron-contents"></div>
+        </div>
+
+        <div class="cauldron-actions">
+          <button type="button" class="btn btn--primary" id="brew-button">Сварить</button>
+          <button type="button" class="btn btn--ghost" id="clear-button" disabled>Очистить</button>
+        </div>
+      </section>
+
+      <!-- ПРАВАЯ КОЛОНКА: инструкция -->
+      <section class="panel panel--help" data-panel="help" data-mobile-active="false" aria-labelledby="help-title">
+        <div class="panel__head">
+          <h2 id="help-title">Как пользоваться</h2>
+        </div>
+
+        <ol class="steps">
+          <li>
+            <strong>Выбери ингредиенты.</strong> Нажми на карточку слева, чтобы положить
+            одну порцию в котёл. Кнопки <code>−</code> и <code>+</code> меняют количество.
+          </li>
+          <li>
+            <strong>Следи за сырой омнисенцией.</strong> Это простая сумма всех
+            ингредиентов, ещё без учёта конфликтов эффектов.
+          </li>
+          <li>
+            <strong>Нажми на котёл.</strong> Сервер погасит взаимно противоположные
+            эффекты и посчитает итог.
+          </li>
+          <li>
+            <strong>Прочитай результат.</strong> Там будет рецепт, эффекты и итоговая
+            омнисенция. Если она вышла за рамки градации, зелье дополнится кристаллами.
+          </li>
+        </ol>
+
+        <details class="accordion" open>
+          <summary>Антагонисты эффектов</summary>
+          <p class="accordion__note">
+            Встретившись в котле, эти пары взаимно уничтожаются — по одной паре за раз.
+          </p>
+          <ul class="pairs" id="conflict-list"></ul>
+        </details>
+
+        <details class="accordion">
+          <summary>Градация омнисенции</summary>
+          <p class="accordion__note">
+            Допустимый диапазон зависит от числа эффектов после конфликтов.
+          </p>
+          <table class="gradation" id="gradation-table">
+            <thead>
+              <tr><th>Эффектов</th><th>Омнисенция</th></tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </details>
+
+        <details class="accordion">
+          <summary>Кристаллы</summary>
+          <ul class="notes">
+            <li><span class="crystal crystal--ihor">ихор</span> — омнисенция ниже минимума: +5 за штуку.</li>
+            <li><span class="crystal crystal--cenom">кеном</span> — омнисенция выше максимума: −5 за штуку.</li>
+          </ul>
+        </details>
+      </section>
+    </main>
+
+    <!-- Липкая панель действий (только на телефоне) -->
+    <div class="mobile-bar">
+      <button type="button" class="mobile-bar__summary" id="bar-summary">
+        <span class="mobile-bar__count"><b id="bar-count">0</b> в котле</span>
+        <span class="mobile-bar__omn" id="bar-omn">0 омнисенции</span>
+      </button>
+      <button type="button" class="btn btn--ghost mobile-bar__clear" id="bar-clear" disabled>
+        Очистить
+      </button>
+      <button type="button" class="btn btn--primary mobile-bar__brew" id="bar-brew" disabled>
+        Сварить
+      </button>
+    </div>
+
+    <!-- Результат варки -->
+    <dialog class="result" id="result-dialog" aria-labelledby="result-title">
+      <div class="result__head">
+        <h2 id="result-title">Зелье готово</h2>
+        <button type="button" class="result__close" id="result-close" aria-label="Закрыть">×</button>
+      </div>
+      <div class="result__body" id="result-body"></div>
+      <div class="result__foot">
+        <button type="button" class="btn btn--ghost" id="result-again">Сварить ещё</button>
+        <button type="button" class="btn btn--primary" id="result-clear">Очистить котёл</button>
+      </div>
+    </dialog>
+
+    <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+    <template id="ingredient-template">
+      <li class="ingredient">
+        <button type="button" class="ingredient__main" data-action="add">
+          <span class="ingredient__top">
+            <span class="ingredient__name"></span>
+            <span class="rarity"></span>
+          </span>
+          <span class="ingredient__meta">
+            <span class="ingredient__omnisention"></span>
+            <span class="ingredient__effects"></span>
+          </span>
+        </button>
+        <div class="stepper" hidden>
+          <button type="button" class="stepper__btn" data-action="dec" aria-label="Убрать одну порцию">−</button>
+          <span class="stepper__value">0</span>
+          <button type="button" class="stepper__btn" data-action="inc" aria-label="Добавить одну порцию">+</button>
+        </div>
+      </li>
+    </template>
+
+    <script src="/static/app.js" defer></script>
+  </body>
+</html>

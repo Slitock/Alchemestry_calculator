@@ -1,4 +1,9 @@
 sandbox/
+.venv/
+
+# SQLite создаётся из database/seed.py, в репозитории ей делать нечего
+data/*.db
+data/*.db-wal
+data/*.db-shm
 
 **/__pycache__/ 
-
