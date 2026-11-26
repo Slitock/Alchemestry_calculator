@@ -137,9 +137,11 @@ jobs:
           tag = os.environ["TAG"]
           digest = pathlib.Path("sha256.txt").read_text(encoding="utf-8").strip()
 
+          # encoding обязателен: на Windows локаль — cp1252, и кириллица
+          # в заметках роняет декодирование.
           body = subprocess.run(
               ["gh", "release", "view", tag, "--json", "body", "--jq", ".body"],
-              capture_output=True, text=True, check=True,
+              capture_output=True, text=True, encoding="utf-8", check=True,
           ).stdout.rstrip()
 
           # Перезапуск workflow не должен дублировать раздел: отрезаем прошлый.
