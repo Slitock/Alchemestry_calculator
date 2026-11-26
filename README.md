@@ -11,6 +11,18 @@
 
 Ингредиенты живут в SQLite и редактируются через `/admin` — код править не нужно.
 
+## Скачать
+
+Готовая сборка для Windows (Python не нужен): распакуйте архив и запустите
+`Alchemy.exe` из папки `Alchemy`.
+
+<https://github.com/Slitock/Alchemestry_calculator/releases/latest/download/Alchemy-windows-x64.zip>
+
+Подробная пошаговая инструкция для Windows, включая настройку локальной сети
+через роутер, — в [`docs/INSTALL_WINDOWS.md`](docs/INSTALL_WINDOWS.md).
+
+Собрать из исходников самому — раздел «Веб-версия» ниже.
+
 ## Веб-версия
 
 ### Установка

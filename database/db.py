@@ -7,13 +7,26 @@
 
 import os
 import sqlite3
+import sys
 from pathlib import Path
 
-BASE_DIR = Path(__file__).resolve().parent.parent
+
+def writable_base_dir():
+    """Папка, рядом с которой приложение хранит изменяемые данные.
+
+    В исходниках — корень проекта. В собранном PyInstaller-файле `__file__`
+    указывает внутрь временной папки `_MEIPASS`, которая удаляется при выходе,
+    поэтому базу кладём рядом с самим `.exe`: она должна переживать перезапуск.
+    """
+    if getattr(sys, "frozen", False):
+        return Path(sys.executable).resolve().parent
+    return Path(__file__).resolve().parent.parent
+
+
 SCHEMA_PATH = Path(__file__).resolve().parent / "schema.sql"
 
 DB_PATH = Path(
-    os.environ.get("ALCHEMY_DB") or (BASE_DIR / "data" / "alchemy.db")
+    os.environ.get("ALCHEMY_DB") or (writable_base_dir() / "data" / "alchemy.db")
 ).expanduser()
 
 
