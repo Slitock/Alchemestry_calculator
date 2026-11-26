@@ -70,20 +70,49 @@ jobs:
             Stop-Process -Id $process.Id -Force -ErrorAction SilentlyContinue
           }
 
+      - name: Убрать базу, созданную дымовым тестом
+        shell: pwsh
+        run: |
+          # Пользователь должен получить чистую папку: база создаётся у него
+          # при первом запуске, а не приезжает из CI.
+          if (Test-Path "dist/Alchemy/data") { Remove-Item -Recurse -Force "dist/Alchemy/data" }
+          if (Test-Path "dist/Alchemy/data") { throw "папка data не удалилась" }
+
       - name: Упаковать в zip
         shell: pwsh
         run: |
           Compress-Archive -Path "dist/Alchemy/*" -DestinationPath "Alchemy-windows-x64.zip"
           Get-Item "Alchemy-windows-x64.zip" | Format-List Name, Length
 
+          Add-Type -AssemblyName System.IO.Compression.FileSystem
+          $zip = [System.IO.Compression.ZipFile]::OpenRead((Resolve-Path "Alchemy-windows-x64.zip"))
+          try {
+            $names = $zip.Entries.FullName
+            if ($names -match '^data/') { throw "в архиве осталась папка data" }
+            foreach ($required in @("Alchemy.exe", "_internal/web/index.html", "_internal/database/schema.sql")) {
+              if ($names -notcontains $required) { throw "в архиве нет $required" }
+            }
+          } finally {
+            $zip.Dispose()
+          }
+
+      - name: Посчитать SHA-256
+        shell: pwsh
+        run: |
+          $hash = (Get-FileHash "Alchemy-windows-x64.zip" -Algorithm SHA256).Hash.ToLower()
+          "$hash  Alchemy-windows-x64.zip" | Set-Content -Path "sha256.txt" -Encoding ascii
+          Get-Content "sha256.txt"
+
       - name: Сохранить артефакт сборки
         uses: actions/upload-artifact@v7
         with:
           name: Alchemy-windows-x64
-          path: Alchemy-windows-x64.zip
+          path: |
+            Alchemy-windows-x64.zip
+            sha256.txt
           if-no-files-found: error
 
-      - name: Приложить zip к релизу
+      - name: Приложить zip и хеш к релизу
         if: startsWith(github.ref, 'refs/tags/')
         shell: pwsh
         env:
@@ -94,4 +123,50 @@ jobs:
           if ($LASTEXITCODE -ne 0) {
             gh release create $tag --title $tag --generate-notes
           }
-          gh release upload $tag Alchemy-windows-x64.zip --clobber
+          gh release upload $tag Alchemy-windows-x64.zip sha256.txt --clobber
+
+      - name: Вписать SHA-256 в заметки релиза
+        if: startsWith(github.ref, 'refs/tags/')
+        shell: python
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          import os, pathlib, subprocess
+
+          tag = os.environ["TAG"]
+          digest = pathlib.Path("sha256.txt").read_text(encoding="utf-8").strip()
+
+          body = subprocess.run(
+              ["gh", "release", "view", tag, "--json", "body", "--jq", ".body"],
+              capture_output=True, text=True, check=True,
+          ).stdout.rstrip()
+
+          # Перезапуск workflow не должен дублировать раздел: отрезаем прошлый.
+          body = body.split("## Контрольная сумма")[0].rstrip()
+
+          # Строки собираются списком, чтобы в заметках не появились отступы YAML.
+          section = "\n".join([
+              "",
+              "---",
+              "",
+              "## Контрольная сумма (SHA-256)",
+              "",
+              "```",
+              digest,
+              "```",
+              "",
+              "Проверка в PowerShell:",
+              "",
+              "```powershell",
+              "Get-FileHash .\\Alchemy-windows-x64.zip -Algorithm SHA256",
+              "```",
+              "",
+              "Или в Linux/macOS: `sha256sum Alchemy-windows-x64.zip`.",
+              "Строка должна совпасть с указанной выше символ в символ. Если не совпала —",
+              "файл повреждён при скачивании или подменён, запускать его не стоит.",
+              "",
+          ])
+
+          pathlib.Path("notes.md").write_text(body + "\n" + section, encoding="utf-8")
+          subprocess.run(["gh", "release", "edit", tag, "--notes-file", "notes.md"], check=True)
